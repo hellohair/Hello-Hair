@@ -1,29 +1,43 @@
-const User = require('../models/User');
+// server/controllers/hairProfileController.js
 const HairProfile = require('../models/HairProfile');
+const User = require('../models/User');
 
-exports.updateHairProfile = async (req, res) => {
+const updateHairProfile = async (req, res) => {
   try {
     const { userId } = req.params;
-    const { hairType, porosity, density } = req.body;
+    const { hairType, porosity, density, texture } = req.body;
 
-    let profile = await HairProfile.findOne({ user: userId });
-
-    if (!profile) {
-      profile = new HairProfile({ user: userId, hairType, porosity, density });
+    let hairProfile = await HairProfile.findOne({ user: userId });
+    if (!hairProfile) {
+      // Create new hair profile
+      hairProfile = new HairProfile({
+        user: userId,
+        hairType,
+        porosity,
+        density,
+        texture
+      });
     } else {
-      profile.hairType = hairType;
-      profile.porosity = porosity;
-      profile.density = density;
+      // Update existing hair profile
+      hairProfile.hairType = hairType;
+      hairProfile.porosity = porosity;
+      hairProfile.density = density;
+      hairProfile.texture = texture;
     }
 
-    await profile.save();
+    await hairProfile.save();
 
-    // Mark hair profile as completed
+    // Optionally mark user as having completed their hair profile
     await User.findByIdAndUpdate(userId, { hairProfileCompleted: true });
 
-    return res.status(200).json({ message: 'Hair profile completed!', profile });
+    res.status(200).json({
+      message: "Hair profile updated successfully!",
+      profile: hairProfile,
+    });
   } catch (error) {
-    console.error('Hair Profile Update Error:', error);
-    return res.status(500).json({ message: 'Failed to complete hair profile' });
+    console.error("Hair profile update error:", error.message);
+    res.status(500).json({ message: "Failed to update hair profile" });
   }
 };
+
+module.exports = { updateHairProfile };

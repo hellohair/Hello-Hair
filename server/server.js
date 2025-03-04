@@ -4,12 +4,13 @@ const cors = require('cors'); // Import CORS
 
 const express = require('express');
 const connectDB = require('./config/db');
+const hairProfileRoutes = require('./routes/hairProfileRoutes');
 
 const authRoutes = require('./routes/authRoutes');
 const userRoutes = require('./routes/userRoutes');
 const communityRoutes = require('./routes/communityRoutes');
 const postRoutes = require('./routes/postRoutes');
-const quizRoutes = require('./routes/quizRoutes');
+const curlQuizRoutes = require('./routes/curlQuizRoutes');
 
 const app = express();
 
@@ -26,7 +27,8 @@ app.use('/api/auth', authRoutes);
 app.use('/api/communities', communityRoutes);
 app.use('/api/users', userRoutes);
 app.use('/api/posts', postRoutes);
-app.use('/api/quiz', quizRoutes);
+app.use('/api/curl-quiz', curlQuizRoutes);
+app.use('/api/hair-profile', hairProfileRoutes);
 
 // Test route
 app.get('/', (req, res) => {
