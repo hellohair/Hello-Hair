@@ -17,12 +17,10 @@ function Register({ setUser }) {
 
   const handleSubmit = async (e) => {
     e.preventDefault();
-
     if (formData.password !== formData.confirmPassword) {
       alert("Passwords do not match");
       return;
     }
-
     try {
       const res = await fetch("http://localhost:5002/api/auth/register", {
         method: "POST",
@@ -34,15 +32,12 @@ function Register({ setUser }) {
         }),
       });
       const data = await res.json();
-
       if (res.ok && data.token) {
-        // Optional: store token and user info if you're using JWT auth
         localStorage.setItem("token", data.token);
         localStorage.setItem("user", JSON.stringify(data.user));
         if (setUser) setUser(data.user);
-
         alert("Account created successfully!");
-        navigate("/hair-profile"); // Redirect to Hair Profile page
+        navigate("/hair-profile");
         window.location.reload();
       } else {
         alert(data.message || "Registration failed.");

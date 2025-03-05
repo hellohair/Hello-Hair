@@ -8,28 +8,23 @@ const register = async (req, res) => {
     if (!username || !email || !password) {
       return res.status(400).json({ message: "All fields are required" });
     }
-
+    
     let user = await User.findOne({ email });
     if (user) {
       return res.status(400).json({ message: "User already exists" });
     }
-
-    // Convert password to string and trim it
-    const passwordString = String(password).trim();
-    const salt = await bcrypt.genSalt(10);
-    const hashedPassword = await bcrypt.hash(passwordString, salt);
-
-    user = new User({ username, email, password: hashedPassword });
+    
+    // The password hashing is handled by the pre-save hook in the User model.
+    user = new User({ username, email, password });
     await user.save();
-
+    
     // Generate JWT token
     const token = jwt.sign(
       { userId: user._id, username: user.username },
       process.env.JWT_SECRET || "fallbackSecret",
       { expiresIn: "1h" }
     );
-
-    // Return token and basic user info
+    
     res.status(201).json({ 
       token, 
       user: { id: user._id, username: user.username, email: user.email } 
@@ -46,27 +41,25 @@ const loginUser = async (req, res) => {
     if (!email || !password) {
       return res.status(400).json({ message: "Email and password are required" });
     }
-
+    
     const user = await User.findOne({ email });
     if (!user) {
       return res.status(400).json({ message: "Invalid email or password" });
     }
-
-    // Force input password to a trimmed string
-    const passwordString = String(password).trim();
-
-    const isMatch = await bcrypt.compare(passwordString, user.password);
+    
+    // Ensure password is converted to a trimmed string before comparison.
+    const isMatch = await bcrypt.compare(String(password).trim(), user.password);
     if (!isMatch) {
       return res.status(400).json({ message: "Invalid email or password" });
     }
-
+    
     // Generate JWT token
     const token = jwt.sign(
       { userId: user._id, username: user.username },
       process.env.JWT_SECRET || "fallbackSecret",
       { expiresIn: "1h" }
     );
-
+    
     res.status(200).json({ 
       token, 
       user: { id: user._id, username: user.username, email: user.email } 
