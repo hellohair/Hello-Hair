@@ -9,6 +9,10 @@ import CurlQuiz from "./pages/CurlQuiz";
 import QuizResults from "./pages/QuizResults";
 import Communities from "./pages/Communities";
 import CommunityDetail from "./pages/CommunityDetail";  // New route
+import Profile from "./pages/Profile";  // New route
+import Friends from "./pages/Friends"; // ✅ Import Friends Page
+
+
 
 function App() {
   const [user, setUser] = useState(null);
@@ -26,6 +30,8 @@ function App() {
         <Route path="/register" element={<Register setUser={setUser} />} />
         <Route path="/login" element={<Login setUser={setUser} />} />
         <Route path="/hair-profile" element={<HairProfile />} />
+        <Route path="/profile/:userId" element={<Profile />} />
+        <Route path="/friends" element={<Friends />} /> {/* ✅ Add Friends Route */}
         <Route path="/quiz" element={<CurlQuiz />} />
         <Route path="/quiz-results" element={<QuizResults />} />
         <Route path="/communities" element={<Communities />} />

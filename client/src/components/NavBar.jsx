@@ -4,7 +4,6 @@ import { Link, useNavigate } from "react-router-dom";
 function NavBar({ user, setUser }) {
   const navigate = useNavigate();
 
-  // Optional: You can refresh user state on mount if needed.
   useEffect(() => {
     try {
       const storedUser = localStorage.getItem("user");
@@ -30,10 +29,12 @@ function NavBar({ user, setUser }) {
         <Link to="/">Home</Link>
         <Link to="/quiz" style={{ marginLeft: "1rem" }}>Curl Quiz</Link>
         <Link to="/communities" style={{ marginLeft: "1rem" }}>Communities</Link>
+        <Link to="/friends" style={{ marginLeft: "1rem" }}>Friends</Link> {/* ✅ Add Friends Button */}
       </div>
       <div>
         {user ? (
           <>
+            <Link to={`/profile/${user.id}`} style={{ marginRight: "1rem" }}>Profile</Link>
             <span style={{ fontWeight: "bold" }}>Signed in as: {user.username || user.email}</span>
             <button onClick={handleLogout} style={{ marginLeft: "1rem" }}>Logout</button>
           </>

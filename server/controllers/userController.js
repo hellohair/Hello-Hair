@@ -1,20 +1,21 @@
 const User = require('../models/User');
 
-exports.updateLocation = async (req, res) => {
-  try {
-    const { country, city } = req.body;
-    const userId = req.userId; // from authMiddleware
-    
-    // Update the user's geographical info
-    const updatedUser = await User.findByIdAndUpdate(
-      userId,
-      { country, city },
-      { new: true }
-    );
-    
-    res.json({ message: 'Location updated successfully', user: updatedUser });
-  } catch (error) {
-    console.error('Location Update Error:', error);
-    res.status(500).json({ message: 'Failed to update location' });
-  }
+// Search users by username (case-insensitive)
+exports.searchUsers = async (req, res) => {
+    try {
+        const { query } = req.query; // Get search query from request
+        if (!query) {
+            return res.status(400).json({ message: "Query parameter is required" });
+        }
+
+        // Perform case-insensitive search
+        const users = await User.find({ 
+            username: { $regex: query, $options: "i" } 
+        }).select("username email profilePicture"); // Only return necessary fields
+
+        res.json(users);
+    } catch (error) {
+        console.error("Error searching users:", error);
+        res.status(500).json({ message: "Server error" });
+    }
 };

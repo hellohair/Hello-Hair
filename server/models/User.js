@@ -2,12 +2,13 @@ const mongoose = require('mongoose');
 const bcrypt = require('bcryptjs');
 
 const UserSchema = new mongoose.Schema({
-  username: { type: String, required: true, unique: true },
-  email:    { type: String, required: true, unique: true, lowercase: true },
-  password: { type: String, required: true },
-  hairProfileCompleted: { type: Boolean, default: false },
-  latestCurlQuiz: { type: mongoose.Schema.Types.ObjectId, ref: 'CurlQuiz' },
-  community: { type: String, default: "" }  // New field for assigned community
+    username: { type: String, required: true, unique: true },
+    email: { type: String, required: true, unique: true, lowercase: true },
+    password: { type: String, required: true },
+    profilePicture: { type: String, default: '' },  // Profile Image URL
+    bio: { type: String, default: '' },
+    followers: [{ type: mongoose.Schema.Types.ObjectId, ref: 'User' }], 
+    following: [{ type: mongoose.Schema.Types.ObjectId, ref: 'User' }], 
 }, { timestamps: true });
 
 // Pre-save hook to hash password

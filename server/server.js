@@ -11,6 +11,7 @@ const userRoutes = require('./routes/userRoutes');
 const communityRoutes = require('./routes/communityRoutes');
 const postRoutes = require('./routes/postRoutes');
 const curlQuizRoutes = require('./routes/curlQuizRoutes');
+const profileRoutes = require('./routes/profileRoutes');
 
 const app = express();
 
@@ -27,6 +28,7 @@ app.use('/api/auth', authRoutes);
 app.use('/api/communities', communityRoutes);
 app.use('/api/users', userRoutes);
 app.use('/api/posts', postRoutes);
+app.use('/api/profile', profileRoutes);
 app.use('/api/curl-quiz', curlQuizRoutes);
 app.use('/api/hair-profile', hairProfileRoutes);
 
