@@ -1,19 +1,10 @@
-import React, { useEffect, useState } from "react";
+import React from "react";
 import { Link, useNavigate } from "react-router-dom";
 
 function NavBar({ user, setUser }) {
   const navigate = useNavigate();
 
-  useEffect(() => {
-    try {
-      const storedUser = localStorage.getItem("user");
-      if (storedUser) {
-        setUser(JSON.parse(storedUser));
-      }
-    } catch (error) {
-      console.error("Error retrieving user data:", error);
-    }
-  }, [setUser]);
+  
 
   const handleLogout = () => {
     localStorage.removeItem("token");
@@ -29,7 +20,9 @@ function NavBar({ user, setUser }) {
         <Link to="/">Home</Link>
         <Link to="/quiz" style={{ marginLeft: "1rem" }}>Curl Quiz</Link>
         <Link to="/communities" style={{ marginLeft: "1rem" }}>Communities</Link>
-        <Link to="/friends" style={{ marginLeft: "1rem" }}>Friends</Link> {/* ✅ Add Friends Button */}
+        <Link to="/friends" style={{ marginLeft: "1rem" }}>Friends</Link>
+        {/* Add the Messaging tab */}
+        <Link to="/messages" style={{ marginLeft: "1rem" }}>Messages</Link>
       </div>
       <div>
         {user ? (

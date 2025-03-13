@@ -1,3 +1,4 @@
+// App.js
 import React, { useState, useEffect } from "react";
 import { BrowserRouter as Router, Routes, Route } from "react-router-dom";
 import NavBar from "./components/NavBar";
@@ -8,11 +9,10 @@ import HairProfile from "./pages/HairProfile";
 import CurlQuiz from "./pages/CurlQuiz";
 import QuizResults from "./pages/QuizResults";
 import Communities from "./pages/Communities";
-import CommunityDetail from "./pages/CommunityDetail";  // New route
-import Profile from "./pages/Profile";  // New route
-import Friends from "./pages/Friends"; // ✅ Import Friends Page
-
-
+import CommunityDetail from "./pages/CommunityDetail";
+import Profile from "./pages/Profile";
+import Friends from "./pages/Friends";
+import Messaging from "./pages/Messaging";
 
 function App() {
   const [user, setUser] = useState(null);
@@ -31,11 +31,12 @@ function App() {
         <Route path="/login" element={<Login setUser={setUser} />} />
         <Route path="/hair-profile" element={<HairProfile />} />
         <Route path="/profile/:userId" element={<Profile />} />
-        <Route path="/friends" element={<Friends />} /> {/* ✅ Add Friends Route */}
+        <Route path="/friends" element={<Friends />} />
         <Route path="/quiz" element={<CurlQuiz />} />
         <Route path="/quiz-results" element={<QuizResults />} />
         <Route path="/communities" element={<Communities />} />
         <Route path="/community/:communityName" element={<CommunityDetail />} />
+        <Route path="/messages" element={<Messaging />} />
       </Routes>
     </Router>
   );
