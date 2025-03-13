@@ -1,19 +1,19 @@
+// models/Post.js
 const mongoose = require('mongoose');
 
 const PostSchema = new mongoose.Schema({
-  user: {
-    type: mongoose.Schema.Types.ObjectId,
-    ref: 'User',
-    required: true,
-  },
-  community: {
-    type: mongoose.Schema.Types.ObjectId,
-    ref: 'Community',
-    required: true,
-  },
+  user: { type: mongoose.Schema.Types.ObjectId, ref: 'User', required: true },
   title: String,
-  content: String,
-  // In the future, you could store video links, images, etc.
+  description: String,
+  mediaUrl: String,       // File or link
+  hairType: String,
+  porosity: String,
+  density: String,
+  thickness: String,
+  curlShape: String,
+  styleOccasion: String,
+  audience: String,       // e.g. "Children", "Teens", "Adults", "All"
+  visibility: String,     // e.g. "Private", "Unlisted", "Public"
 }, { timestamps: true });
 
 module.exports = mongoose.model('Post', PostSchema);

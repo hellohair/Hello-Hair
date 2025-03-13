@@ -6,16 +6,20 @@ const authMiddleware = (req, res, next) => {
   if (!authHeader) {
     return res.status(401).json({ message: 'No token provided' });
   }
+
+  // Expecting "Bearer <token>"
   const token = authHeader.split(' ')[1];
   if (!token) {
     return res.status(401).json({ message: 'No token provided' });
   }
+
   try {
+    // Must match process.env.JWT_SECRET in your .env
     const decoded = jwt.verify(token, process.env.JWT_SECRET);
-    req.userId = decoded.userId;
+    req.userId = decoded.userId; // or whatever payload you set
     next();
   } catch (error) {
-    res.status(401).json({ message: 'Invalid token' });
+    return res.status(401).json({ message: 'Invalid token' });
   }
 };
 
