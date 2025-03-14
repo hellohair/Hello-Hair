@@ -1,27 +1,26 @@
 // src/pages/Home.jsx
 import React, { useEffect, useState } from 'react';
+import NewPostModal from '../components/NewPostModal';
 
-// Helper: Check if a URL is a YouTube link (watch or short)
+// --- Helper Functions ---
 function isYouTubeLink(url) {
   if (!url) return false;
   return url.includes('youtube.com') || url.includes('youtu.be');
 }
 
-// Helper: Convert a YouTube watch or short link to an embed link
 function convertToYouTubeEmbed(originalUrl) {
   try {
     const parsed = new URL(originalUrl);
-    // For short links: https://youtu.be/XYZ
+    // For short links (e.g. https://youtu.be/XYZ)
     if (parsed.hostname === 'youtu.be') {
-      const videoId = parsed.pathname.slice(1); // remove leading '/'
+      const videoId = parsed.pathname.slice(1);
       return `https://www.youtube.com/embed/${videoId}`;
     }
-    // For standard watch links: https://www.youtube.com/watch?v=XYZ
+    // For watch links (e.g. https://www.youtube.com/watch?v=XYZ)
     const videoId = parsed.searchParams.get('v');
     if (videoId) {
       return `https://www.youtube.com/embed/${videoId}`;
     }
-    // Fallback: return original URL if already embed or unknown format
     return originalUrl;
   } catch (err) {
     console.error('Error converting YouTube URL:', err);
@@ -29,16 +28,13 @@ function convertToYouTubeEmbed(originalUrl) {
   }
 }
 
-// Helper: Check if URL likely points to an image
 function isImageLink(url) {
   const imageExtensions = ['.jpg', '.jpeg', '.png', '.gif', '.webp'];
   return imageExtensions.some(ext => url.toLowerCase().endsWith(ext));
 }
 
-// Helper: Render media based on URL type
 function renderMedia(mediaUrl) {
   if (!mediaUrl) return null;
-  
   if (isYouTubeLink(mediaUrl)) {
     const embedUrl = convertToYouTubeEmbed(mediaUrl);
     return (
@@ -52,7 +48,6 @@ function renderMedia(mediaUrl) {
       />
     );
   }
-  
   if (isImageLink(mediaUrl)) {
     return (
       <img
@@ -62,7 +57,6 @@ function renderMedia(mediaUrl) {
       />
     );
   }
-  
   // Fallback: display a clickable link
   return (
     <a href={mediaUrl} target="_blank" rel="noreferrer">
@@ -71,12 +65,13 @@ function renderMedia(mediaUrl) {
   );
 }
 
+// --- Home Component ---
 function Home() {
   const [posts, setPosts] = useState([]);
-  // State for comment inputs keyed by post ID
+  const [showModal, setShowModal] = useState(false);
   const [commentInputs, setCommentInputs] = useState({});
-  
-  // Fetch home posts (posts with community=null, using communityId=none)
+
+  // Fetch home posts (community = null, passed as ?communityId=none)
   useEffect(() => {
     fetch('http://localhost:5002/api/posts?communityId=none')
       .then(res => res.json())
@@ -90,26 +85,26 @@ function Home() {
       })
       .catch(err => console.error('Error fetching home posts:', err));
   }, []);
-  
-  // Handle comment input change for a specific post
+
+  // Handle comment input changes
   const handleCommentChange = (postId, value) => {
     setCommentInputs(prev => ({
       ...prev,
       [postId]: value,
     }));
   };
-  
-  // Add a comment (reply) to a post
+
+  // Add a comment to a post
   const handleAddComment = async (postId) => {
     const content = commentInputs[postId]?.trim();
     if (!content) return;
-    
+
     const token = localStorage.getItem("token");
     if (!token) {
       alert("You need to log in first!");
       return;
     }
-    
+
     try {
       const res = await fetch(`http://localhost:5002/api/posts/${postId}/comments`, {
         method: "POST",
@@ -121,9 +116,10 @@ function Home() {
       });
       const data = await res.json();
       if (res.ok) {
-        // data.post is the updated post with new comments
-        setPosts(prevPosts => prevPosts.map(post => post._id === postId ? data.post : post));
-        // Clear the input for that post
+        // Update the post in state with new comments
+        setPosts(prevPosts =>
+          prevPosts.map(post => post._id === postId ? data.post : post)
+        );
         setCommentInputs(prev => ({ ...prev, [postId]: "" }));
       } else {
         alert(data.message || "Error adding comment");
@@ -133,18 +129,37 @@ function Home() {
     }
   };
 
+  // Called after a new post is created
+  const handlePostCreated = (newPost) => {
+    setPosts(prev => [newPost, ...prev]);
+  };
+
   return (
     <div style={{ padding: 20 }}>
       <h1>Home Page</h1>
+      <button onClick={() => setShowModal(true)} style={styles.newPostButton}>
+        + Create New Post
+      </button>
+      {showModal && (
+        <NewPostModal
+          communityId={null} // Home posts have community = null
+          onClose={() => setShowModal(false)}
+          onPostCreated={handlePostCreated}
+        />
+      )}
+
       {posts.map(post => (
         <div key={post._id} style={styles.postCard}>
           {post.title && <h2>{post.title}</h2>}
           {post.description && <p>{post.description}</p>}
           {renderMedia(post.mediaUrl)}
-          <p><strong>Visibility:</strong> {post.visibility || 'N/A'}</p>
-          <p><strong>Posted by:</strong> {post.user?.username || 'Unknown'}</p>
-          
-          {/* Comments Section */}
+          <p>
+            <strong>Visibility:</strong> {post.visibility || 'N/A'}
+          </p>
+          <p>
+            <strong>Posted by:</strong> {post.user?.username || 'Unknown'}
+          </p>
+          {/* Comments */}
           {post.comments && post.comments.length > 0 && (
             <div style={styles.commentSection}>
               {post.comments.map(comment => (
@@ -154,8 +169,7 @@ function Home() {
               ))}
             </div>
           )}
-          
-          {/* Reply Form (if logged in) */}
+          {/* Reply form (only show if logged in) */}
           {localStorage.getItem("token") && (
             <div style={styles.commentForm}>
               <input
@@ -177,6 +191,15 @@ function Home() {
 }
 
 const styles = {
+  newPostButton: {
+    backgroundColor: "#3b82f6",
+    color: "#fff",
+    border: "none",
+    borderRadius: 4,
+    padding: "0.5rem 1rem",
+    marginBottom: 20,
+    cursor: "pointer",
+  },
   postCard: {
     border: "1px solid #ccc",
     padding: 10,
